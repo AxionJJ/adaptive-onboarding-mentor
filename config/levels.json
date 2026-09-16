@@ -1,0 +1,9 @@
+{
+  "order": ["guide", "ask", "silent"],
+  "labels": { "guide": "안내", "ask": "질문", "silent": "침묵" },
+  "rules": {
+    "lowerAfterConsecutiveSuccess": 1,
+    "raiseOnMiss": 1,
+    "initialLevel": "guide"
+  }
+}
