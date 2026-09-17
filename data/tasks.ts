@@ -55,7 +55,7 @@ export const TASKS: TaskSpec[] = [
       ],
       team: [
         "상태 전환을 바꿨으므로 __tests__/RefundService.test.ts에 부분 환불 케이스 테스트 추가 (CONTRIBUTING 1항)",
-        "정책 조건을 서비스 코드에 직접 쓰지 않고 RefundPolicy 함수 호출 (CONTRIBUTING 2항)",
+        "정책 조건을 서비스 코드에 직접 하드코딩하지 않음 — 쓸 거면 RefundPolicy 함수 호출 (CONTRIBUTING 2항). 조건을 아예 빠뜨린 것은 도메인 영역의 몫",
       ],
     },
   },

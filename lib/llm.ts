@@ -5,9 +5,10 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import type { z } from "zod";
 
-export const MODEL = process.env.LLM_MODEL ?? "gpt-5.5";
+export const MODEL = process.env.LLM_MODEL ?? "gpt-5.4-mini";
 
 // 모델은 키의 모델 목록에 있는 것만 쓴다 (2026-09-17 확인: gpt-5.5, gpt-5.4, gpt-5.4-mini 있음. "gpt-5.6"은 없음).
+// 기본은 가장 싼 gpt-5.4-mini (2026-09-18 하네스 10/10 목표 판정, p50 3초). 올리려면 Vercel env LLM_MODEL.
 // timeout 단위는 ms. 리뷰 호출이 가장 길다. 재시도 1회 → 최악 40초 (라우트 maxDuration 60).
 // 키가 없으면 생성자가 던지므로 지연 생성한다 (빌드 시 키 없이도 통과해야 함).
 let client: OpenAI | null = null;

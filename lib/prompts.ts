@@ -85,7 +85,7 @@ export function buildHintPrompt(req: HintRequest): { system: string; user: strin
   const task = getTask(req.taskId)!;
   const p = PERSONAS[req.domain];
   const levelInstr: Record<Level, string> = {
-    guide: `안내 모드. 이 영역에서 어디를 왜 봐야 하는지 알려준다. 파일명과 조건을 구체적으로 지목한다. 단, 완성된 코드는 주지 않는다. 3문장 이내.`,
+    guide: `안내 모드. 이 영역에서 어디를 왜 봐야 하는지 알려준다. 파일명과 조건을 구체적으로 지목한다. 단, 완성된 코드는 주지 않는다. 3문장 이내, 전체 150자 이내.`,
     ask: `질문 모드. 답을 주지 않는다. 이 영역에서 놓치기 쉬운 것을 스스로 확인하게 만드는 질문 딱 1개만 던진다. 1문장.`,
     silent: `침묵 모드. 이 호출은 오지 않아야 한다. 빈 문자열을 반환한다.`,
   };
@@ -115,9 +115,9 @@ export function buildApproachPrompt(req: { taskId: string; approachText: string 
   const system = `${COMMON_RULES}
 
 사용자가 코드를 고치기 전에 쓴 "접근 방법"을 읽고, 영역별로 **이해했는가**만 판단한다.
-- codebase: 어디를(어떤 파일/함수) 왜 고쳐야 하는지 아는가
+- codebase: 어디를(어떤 파일/함수) 왜 고쳐야 하는지 아는가. 수정할 파일과 함수를 맞게 지목했으면 understood=true. assertTransition 사용 같은 구현 디테일은 코드 리뷰에서 보므로 여기서 요구하지 않는다
 - domain: 관련 비즈니스 규칙(정책 조건)을 인지하고 있는가. 요건에 있는 조건을 언급하지 않았으면 understood=false
-- team: 팀 규칙(테스트, 정책 함수 호출)을 지킬 계획인가
+- team: 팀 규칙을 지킬 계획인가. 상태 전환을 바꾸면서 테스트를 추가할 계획이 있으면 understood=true. 정책 함수 호출을 언급하지 않았다는 이유만으로 false를 주지 않는다 (정책 조건 누락은 domain의 몫)
 note는 1문장. 이해했으면 무엇을 이해했는지, 아니면 무엇이 빠졌는지 — 단, 답을 직접 알려주지 말고 "확인해볼 것"으로 표현한다.`;
   const user = `${taskBlock(task)}
 
@@ -142,6 +142,7 @@ export function buildReviewPrompt(req: ReviewRequest): { system: string; user: s
 
 영역별로 다음을 낸다:
 - kind: 그 영역의 확인 요건을 모두 충족하면 "self_success", 하나라도 빠지면 "miss". 요건에 없는 것으로 miss를 주지 않는다.
+- 같은 누락을 두 영역에서 이중으로 miss 처리하지 않는다. 정책 조건(상한/기간/상태)을 확인하지 않은 것은 **domain 한 곳**의 miss다. team의 "정책 함수 호출" 요건은 조건을 서비스 코드에 직접 하드코딩한 경우에만 miss이고, 조건을 아예 안 쓴 것은 team miss가 아니다.
 - evidence: 판정 근거 한 줄 (20자 내외, 명사형). 화면의 "근거:" 뒤에 그대로 붙는다. 예: "부분 환불 누적 상한 조건 누락", "수정 위치를 정확히 찾음", "부분 환불 테스트 추가"
 - comment: 그 리뷰어의 말투로 2문장 이내. 이름은 붙이지 않는다. 같은 유형의 놓침이 기록에 있으면 "지난번과 같은 유형"이라고 말한다.
 
