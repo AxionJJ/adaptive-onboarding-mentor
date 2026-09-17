@@ -4,10 +4,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { DomainCard } from "@/components/DomainCard";
 import { Header } from "@/components/Header";
-import { LevelBadge } from "@/components/LevelBadge";
 import { TASKS, LIVE_TASK_ID } from "@/data/tasks";
-import { DOMAIN_LABELS, buildSeedState, currentReason } from "@/lib/policy";
+import { buildSeedState, currentReason } from "@/lib/policy";
 import { PERSONAS } from "@/lib/prompts";
 import { loadState } from "@/lib/state";
 import { DOMAINS, type AppState } from "@/lib/types";
@@ -25,70 +25,70 @@ export default function Home() {
   const liveDone = state.completedTaskIds.includes(LIVE_TASK_ID);
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-8">
+    <main className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-8">
       <Header />
 
-      <section className="mt-8">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">지난 기록</h2>
-        <ul className="mt-3 divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white">
-          {done.map((t) => {
-            const misses = DOMAINS.flatMap((d) =>
-              state.domains[d].events.filter((e) => e.taskId === t.id && e.kind === "miss"),
-            );
-            return (
-              <li key={t.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-4 py-3">
-                <span className="w-8 shrink-0 font-mono text-xs text-zinc-400">{t.id}</span>
-                <span className="flex-1 basis-48">{t.title}</span>
-                <span className="text-xs font-medium text-emerald-700">완료</span>
-                {misses.length > 0 && (
-                  <span className="basis-full pl-11 text-xs text-zinc-500">
-                    └ {misses.map((m) => `${PERSONAS[m.domain].name} 지적`).join(", ")}
-                  </span>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      </section>
-
-      <section className="mt-8">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">지금 상태</h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          영역마다 지원 수준이 다릅니다. 근거는 기록에서 나옵니다.
+      <section className="mt-10 max-w-3xl">
+        <h1 className="text-3xl font-black leading-tight tracking-tight sm:text-4xl">
+          영역마다 지원 수준이 다릅니다.
+        </h1>
+        <p className="mt-3 text-[15px] leading-relaxed text-muted">
+          코드베이스는 이미 혼자 하고, 도메인은 아직 안내가 필요하고, 팀 규칙은 확인 질문만 남았습니다.
+          근거는 지난 기록에서 나옵니다.
         </p>
-        <ul className="mt-3 space-y-2">
-          {DOMAINS.map((d) => {
-            const ds = state.domains[d];
-            return (
-              <li
-                key={d}
-                className="grid grid-cols-[6rem_auto] items-start gap-x-3 gap-y-1 rounded-lg border border-zinc-200 bg-white px-4 py-3 sm:grid-cols-[7rem_4.5rem_1fr]"
-              >
-                <span className="font-medium">{DOMAIN_LABELS[d]}</span>
-                <LevelBadge level={ds.level} />
-                <span className="col-span-2 text-sm text-zinc-600 sm:col-span-1">
-                  <span className="text-zinc-400">근거: </span>
-                  {currentReason(d, ds)}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
       </section>
 
-      <div className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-        <Link
-          href={`/task/${LIVE_TASK_ID}`}
-          className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-5 py-3 font-semibold text-white hover:bg-zinc-700"
-        >
-          {liveDone ? `${live.id} 다시 해보기` : `${live.id} 시작하기`} — {live.title}
-        </Link>
-        {liveDone && (
-          <Link href="/next" className="text-sm text-zinc-500 underline-offset-4 hover:underline">
-            다음 태스크 예고 보기
+      <section className="mt-8 grid gap-4 sm:grid-cols-3">
+        {DOMAINS.map((d) => (
+          <DomainCard key={d} domain={d} level={state.domains[d].level} reason={currentReason(d, state.domains[d])} />
+        ))}
+      </section>
+
+      <section className="mt-6 grid gap-5 lg:grid-cols-[1fr_22rem]">
+        <div className="overflow-hidden rounded-2xl border border-line bg-card">
+          <h2 className="border-b border-line px-5 py-3 text-xs font-bold text-muted">지난 기록</h2>
+          <ul className="divide-y divide-line">
+            {done.map((t) => {
+              const misses = DOMAINS.flatMap((d) =>
+                state.domains[d].events.filter((e) => e.taskId === t.id && e.kind === "miss"),
+              );
+              return (
+                <li key={t.id} className="flex items-center gap-4 px-5 py-4">
+                  <span className="w-7 shrink-0 font-mono text-xs text-faint">{t.id}</span>
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="text-sm">{t.title}</span>
+                    {misses.length > 0 && (
+                      <span className="text-xs text-faint">
+                        {misses.map((m) => `${PERSONAS[m.domain].name} 지적`).join(", ")}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs font-bold text-ok">완료</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        <div className="flex flex-col gap-3 rounded-2xl bg-ink p-6 text-ink-fg">
+          <span className="text-xs font-bold opacity-70">{liveDone ? "다시 해보기" : "다음 태스크"}</span>
+          <span className="text-[17px] font-bold leading-snug">
+            {live.id} {live.title}
+          </span>
+          <Link
+            href={`/task/${LIVE_TASK_ID}`}
+            className="mt-1 inline-flex items-center justify-center rounded-xl bg-card px-4 py-3.5 text-[15px] font-bold text-fg hover:opacity-90"
+          >
+            시작하기
           </Link>
-        )}
-      </div>
+          <span className="text-xs opacity-70">직접 해보지 않아도 결과를 가정하고 넘어갈 수 있습니다.</span>
+          {liveDone && (
+            <Link href="/next" className="text-xs underline underline-offset-4 opacity-80 hover:opacity-100">
+              다음 태스크 예고 보기
+            </Link>
+          )}
+        </div>
+      </section>
     </main>
   );
 }
