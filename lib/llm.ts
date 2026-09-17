@@ -5,8 +5,9 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import type { z } from "zod";
 
-export const MODEL = process.env.LLM_MODEL ?? "gpt-5.6";
+export const MODEL = process.env.LLM_MODEL ?? "gpt-5.5";
 
+// 모델은 키의 모델 목록에 있는 것만 쓴다 (2026-09-17 확인: gpt-5.5, gpt-5.4, gpt-5.4-mini 있음. "gpt-5.6"은 없음).
 // timeout 단위는 ms. 리뷰 호출이 가장 길다. 재시도 1회 → 최악 40초 (라우트 maxDuration 60).
 // 키가 없으면 생성자가 던지므로 지연 생성한다 (빌드 시 키 없이도 통과해야 함).
 let client: OpenAI | null = null;
@@ -43,9 +44,10 @@ export async function structured<S extends z.ZodTypeAny>(
     if (error instanceof OpenAI.AuthenticationError) {
       console.error("[llm] invalid API key");
     } else if (error instanceof OpenAI.RateLimitError) {
-      console.error("[llm] rate limited");
+      // 429는 속도 제한뿐 아니라 크레딧 소진(insufficient_quota)도 포함한다. code로 구분.
+      console.error(`[llm] 429 ${error.code ?? "rate_limit"}: ${error.message}`);
     } else if (error instanceof OpenAI.APIError) {
-      console.error(`[llm] API error ${error.status}: ${error.message}`);
+      console.error(`[llm] API error ${error.status} ${error.code ?? ""}: ${error.message}`);
     } else {
       console.error("[llm] request failed", error);
     }
