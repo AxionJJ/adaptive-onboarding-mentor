@@ -12,12 +12,19 @@ import { PERSONAS } from "@/lib/prompts";
 import { loadState, resetState } from "@/lib/state";
 import { DOMAINS, type AppState, type Domain, type Level } from "@/lib/types";
 
+// 받침 유무로 조사를 고른다 (팀장은 / 선임 개발자는).
+function josa(word: string, withFinal: string, withoutFinal: string): string {
+  const code = word.charCodeAt(word.length - 1);
+  const hasFinal = code >= 0xac00 && code <= 0xd7a3 && (code - 0xac00) % 28 !== 0;
+  return `${word}${hasFinal ? withFinal : withoutFinal}`;
+}
+
 function note(d: Domain, level: Level, newDomainNote?: string): string {
   if (d === "domain") return newDomainNote ?? "";
   const who = PERSONAS[d].name;
-  if (level === "silent") return `${who}는 먼저 말하지 않습니다.`;
-  if (level === "ask") return `${who}가 확인 질문을 한 번 합니다.`;
-  return `${who}가 어디를 봐야 하는지 안내합니다.`;
+  if (level === "silent") return `${josa(who, "은", "는")} 먼저 말하지 않습니다.`;
+  if (level === "ask") return `${josa(who, "이", "가")} 확인 질문을 한 번 합니다.`;
+  return `${josa(who, "이", "가")} 어디를 봐야 하는지 안내합니다.`;
 }
 
 export default function NextPage() {
