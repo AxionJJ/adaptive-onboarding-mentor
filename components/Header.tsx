@@ -11,8 +11,9 @@ export function Header({ step }: { step?: string }) {
   return (
     <header className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-5">
       <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-        <Link href="/" className="text-lg font-bold tracking-tight">
-          Adaptive Onboarding Mentor
+        <Link href="/" className="flex flex-wrap items-baseline gap-x-2">
+          <span className="text-lg font-bold tracking-tight">Scaffold Agent</span>
+          <span className="text-xs font-medium text-muted">Adaptive Onboarding Mentor</span>
         </Link>
         <span className="text-sm text-muted">
           {COMPANY_NAME} 백엔드팀, 입사 3주차{step ? `, ${step}` : ""}

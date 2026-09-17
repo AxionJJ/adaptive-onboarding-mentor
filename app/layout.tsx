@@ -10,7 +10,7 @@ const notoSansKr = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: "Adaptive Onboarding Mentor",
+  title: "Scaffold Agent — Adaptive Onboarding Mentor",
   description: "일을 끝내주는 AI가 아니라, 일을 끝내면서 적응까지 끝나게 하는 AI",
 };
 
